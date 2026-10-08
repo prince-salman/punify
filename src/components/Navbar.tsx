@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ArrowRight, Menu, X, MapPin, PackageCheck } from 'lucide-react';
+import { Search, ArrowRight, Menu, X, MapPin, PackageCheck, Download } from 'lucide-react';
 
 interface NavbarProps {
   onOpenOrder: () => void;
@@ -82,6 +82,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenTracker }) =>
 
           {/* CTA Actions */}
           <div className="hidden sm:flex items-center gap-3">
+            {/* Install PWA App Button */}
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event('punify_trigger_pwa_install'))}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-full transition-colors whitespace-nowrap border border-blue-200"
+              title="Install PUNIFY App"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Install App</span>
+            </button>
+
             <button
               onClick={onOpenTracker}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 rounded-full transition-colors whitespace-nowrap"
@@ -154,6 +165,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenTracker }) =>
               Student Team Profile
             </a>
           </div>
+          <button
+            type="button"
+            onClick={() => {
+              setMobileMenuOpen(false);
+              window.dispatchEvent(new Event('punify_trigger_pwa_install'));
+            }}
+            className="w-full py-2.5 px-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 font-bold text-xs flex items-center justify-center space-x-2 transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            <span>Install PUNIFY App</span>
+          </button>
           <button
             onClick={() => {
               setMobileMenuOpen(false);

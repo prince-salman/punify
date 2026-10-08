@@ -9,6 +9,7 @@ import { TeamSection } from './components/TeamSection';
 import { Footer } from './components/Footer';
 import { OrderSummaryModal } from './components/OrderSummaryModal';
 import { LiveOrderToast } from './components/LiveOrderToast';
+import { PWAInstallBanner } from './components/PWAInstallBanner';
 import { ServiceId, CalculatedInvoice, OrderState } from './types/order';
 import { initCloudSync } from './utils/cloudSync';
 
@@ -130,6 +131,9 @@ export function App() {
           handleScrollToTracker();
         }}
       />
+
+      {/* PWA Application Installation Prompt & iOS Guide */}
+      <PWAInstallBanner />
 
       {/* Order Summary & QRIS/WhatsApp Modal */}
       {activeModalInvoice && activeOrderState && (

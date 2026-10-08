@@ -1,0 +1,50 @@
+{
+  "name": "PUNIFY - Campus Printing & Student Hub",
+  "short_name": "PUNIFY",
+  "description": "President University's #1 On-Demand Campus Printing, Merchandising & Dorm Delivery Portal",
+  "id": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FFFFFF",
+  "theme_color": "#2563EB",
+  "lang": "en",
+  "categories": ["education", "business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Configure New Order",
+      "short_name": "New Order",
+      "description": "Order printing, name tags, or course packs",
+      "url": "/#order-portal",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Track Live Order",
+      "short_name": "Order Tracker",
+      "description": "Track print queue and dorm delivery status",
+      "url": "/#tracker",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

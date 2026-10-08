@@ -7,7 +7,6 @@ import {
   Check, 
   ExternalLink, 
   MessageCircle,
-  Printer,
   Clock,
   ShieldCheck,
   Sparkles,
@@ -85,10 +84,6 @@ Halo admin PUNIFY, saya ingin konfirmasi pesanan ini agar segera diproses. Terim
     navigator.clipboard.writeText(invoice.orderId);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handlePrintReceipt = () => {
-    window.print();
   };
 
   const handleSimulatePayment = () => {
@@ -264,23 +259,14 @@ Halo admin PUNIFY, saya ingin konfirmasi pesanan ini agar segera diproses. Terim
               <ExternalLink className="w-3.5 h-3.5 ml-1" />
             </a>
 
-            <div className="grid grid-cols-3 gap-2 text-xs">
+            <div className="grid grid-cols-2 gap-2 text-xs">
               <button
                 type="button"
                 onClick={handleCopyOrderId}
-                className="py-2 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-medium flex items-center justify-center space-x-1"
+                className="py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-medium flex items-center justify-center space-x-1 transition-colors"
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copied ? 'Tersalin' : 'Salin ID'}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handlePrintReceipt}
-                className="py-2 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-medium flex items-center justify-center space-x-1"
-              >
-                <Printer className="w-3.5 h-3.5 text-slate-600" />
-                <span>Cetak Nota</span>
+                <span>{copied ? 'Tersalin' : 'Salin ID Pesanan'}</span>
               </button>
 
               <button
@@ -289,7 +275,7 @@ Halo admin PUNIFY, saya ingin konfirmasi pesanan ini agar segera diproses. Terim
                   onClose();
                   onViewTracker(invoice.orderId);
                 }}
-                className="py-2 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 font-semibold text-center truncate"
+                className="py-2.5 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 font-semibold text-center truncate transition-colors"
               >
                 Lacak Status ➔
               </button>

@@ -10,7 +10,6 @@ import {
   FileText, 
   User, 
   Phone, 
-  Printer,
   Download,
   ExternalLink,
   MessageCircle,
@@ -19,7 +18,6 @@ import {
 } from 'lucide-react';
 import { getOrderById, getSavedOrders, updateOrderStatus, SavedOrder } from '../utils/orderStorage';
 import { OrderStatus } from '../types/order';
-import { OfficialReceiptModal } from './OfficialReceiptModal';
 import { sounds } from '../utils/audio';
 import { ADMIN_WHATSAPP_INTL } from '../data/contact';
 
@@ -33,7 +31,6 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ initialOrderId = 'PU
   const [allOrders, setAllOrders] = useState<SavedOrder[]>(() => getSavedOrders());
   const [feedbackMsg, setFeedbackMsg] = useState<string>('');
   const [viewMode, setViewMode] = useState<'student' | 'operator'>('student');
-  const [showOfficialReceipt, setShowOfficialReceipt] = useState<boolean>(false);
   const [selectedCourier, setSelectedCourier] = useState<string>('Dimas (Kurir SH Tower 1 & 2)');
 
   // URL deep-link listener
@@ -256,14 +253,6 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ initialOrderId = 'PU
                   <span className="text-xl font-mono font-extrabold text-slate-900">
                     Rp {currentOrder.totalAmount.toLocaleString('id-ID')}
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => setShowOfficialReceipt(true)}
-                    className="mt-1 flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-semibold transition-colors shadow-2xs"
-                  >
-                    <Printer className="w-3.5 h-3.5 text-blue-600" />
-                    <span>Cetak Nota Resmi</span>
-                  </button>
                 </div>
               </div>
 
@@ -479,12 +468,6 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ initialOrderId = 'PU
                     <span>Chat Admin WA</span>
                   </a>
                   <button
-                    onClick={() => setShowOfficialReceipt(true)}
-                    className="px-3 py-1.5 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-semibold shadow-2xs"
-                  >
-                    Lihat Bukti Nota
-                  </button>
-                  <button
                     onClick={() => setViewMode('operator')}
                     className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-2xs flex items-center space-x-1"
                   >
@@ -514,14 +497,6 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ initialOrderId = 'PU
           <div className="p-8 text-center border border-dashed border-slate-200 rounded-xl text-slate-500 text-xs">
             Pesanan tidak ditemukan. Silakan masukkan nomor Order ID yang valid di atas atau buat pesanan baru.
           </div>
-        )}
-
-        {/* Official Receipt Modal */}
-        {showOfficialReceipt && currentOrder && (
-          <OfficialReceiptModal
-            order={currentOrder}
-            onClose={() => setShowOfficialReceipt(false)}
-          />
         )}
 
       </div>

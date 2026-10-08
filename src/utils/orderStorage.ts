@@ -51,7 +51,7 @@ const SEED_ORDERS: SavedOrder[] = [
     status: 'in_production',
     statusHistory: [
       { status: 'placed', timestamp: '19:15 WIB', note: 'Pesanan masuk via web PUNIFY' },
-      { status: 'verified', timestamp: '19:22 WIB', note: 'Bukti transfer QRIS terverifikasi admin' },
+      { status: 'verified', timestamp: '19:22 WIB', note: 'Pembayaran transfer QRIS terverifikasi admin' },
       { status: 'in_production', timestamp: '19:30 WIB', note: 'Mesin cetak sedang memproses 84 halaman' }
     ]
   },

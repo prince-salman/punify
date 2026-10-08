@@ -14,9 +14,19 @@ import {
   ExternalLink,
   MessageCircle,
   Wrench,
-  Sparkles
+  Sparkles,
+  Copy,
+  Check
 } from 'lucide-react';
-import { getOrderById, getSavedOrders, updateOrderStatus, SavedOrder } from '../utils/orderStorage';
+import { 
+  getOrderById, 
+  getSavedOrders, 
+  updateOrderStatus, 
+  resolveOrderOrMock, 
+  importOrderFromUrl, 
+  encodeOrderForUrl, 
+  SavedOrder 
+} from '../utils/orderStorage';
 import { OrderStatus } from '../types/order';
 import { sounds } from '../utils/audio';
 import { ADMIN_WHATSAPP_INTL } from '../data/contact';
@@ -27,39 +37,76 @@ interface OrderTrackerProps {
 
 export const OrderTracker: React.FC<OrderTrackerProps> = ({ initialOrderId = 'PUN-2026-4821' }) => {
   const [searchId, setSearchId] = useState(initialOrderId);
-  const [currentOrder, setCurrentOrder] = useState<SavedOrder | undefined>(() => getOrderById(initialOrderId));
+  const [currentOrder, setCurrentOrder] = useState<SavedOrder | undefined>(() => 
+    getOrderById(initialOrderId) || resolveOrderOrMock(initialOrderId)
+  );
   const [allOrders, setAllOrders] = useState<SavedOrder[]>(() => getSavedOrders());
   const [feedbackMsg, setFeedbackMsg] = useState<string>('');
+  const [copiedLink, setCopiedLink] = useState(false);
   const [viewMode, setViewMode] = useState<'student' | 'operator'>('student');
   const [selectedCourier, setSelectedCourier] = useState<string>('Dimas (Courier SH Tower 1 & 2)');
 
-  // URL deep-link listener
+  // Reactively respond to initialOrderId prop changes (e.g. from newly placed orders)
+  useEffect(() => {
+    if (initialOrderId) {
+      const found = getOrderById(initialOrderId) || resolveOrderOrMock(initialOrderId);
+      if (found) {
+        setSearchId(found.orderId);
+        setCurrentOrder(found);
+        setAllOrders(getSavedOrders());
+      }
+    }
+  }, [initialOrderId]);
+
+  // URL deep-link & cross-device payload listener
   useEffect(() => {
     const handleUrlCheck = () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const trackParam = urlParams.get('track');
-      const hash = window.location.hash;
-      let targetId = trackParam;
+      // 1. First attempt to auto-import encoded order payload from URL
+      const imported = importOrderFromUrl();
+      if (imported) {
+        setSearchId(imported.orderId);
+        setCurrentOrder(imported);
+        setAllOrders(getSavedOrders());
+        setFeedbackMsg(`✓ Order ${imported.orderId} loaded directly from link!`);
+        setTimeout(() => setFeedbackMsg(''), 4000);
+        return;
+      }
 
-      if (!targetId && hash.includes('id=')) {
-        targetId = hash.split('id=')[1]?.split('&')[0];
+      // 2. Otherwise look for ?id= or ?track= in search params or hash
+      const urlParams = new URLSearchParams(window.location.search);
+      let targetId = urlParams.get('track') || urlParams.get('id');
+
+      if (!targetId && window.location.hash) {
+        const hashPart = window.location.hash;
+        if (hashPart.includes('?')) {
+          const queryPart = hashPart.split('?')[1];
+          const hashParams = new URLSearchParams(queryPart);
+          targetId = hashParams.get('id') || hashParams.get('track');
+        } else if (hashPart.includes('id=')) {
+          targetId = hashPart.split('id=')[1]?.split('&')[0];
+        }
       }
 
       if (targetId) {
-        const found = getOrderById(targetId);
+        const found = getOrderById(targetId) || resolveOrderOrMock(targetId);
         if (found) {
-          setSearchId(targetId);
+          setSearchId(found.orderId);
           setCurrentOrder(found);
+          setAllOrders(getSavedOrders());
         }
       }
     };
 
     handleUrlCheck();
     window.addEventListener('popstate', handleUrlCheck);
-    return () => window.removeEventListener('popstate', handleUrlCheck);
+    window.addEventListener('hashchange', handleUrlCheck);
+    return () => {
+      window.removeEventListener('popstate', handleUrlCheck);
+      window.removeEventListener('hashchange', handleUrlCheck);
+    };
   }, []);
 
-  // Listen to order storage updates from other components
+  // Real-time synchronization across windows and tabs
   useEffect(() => {
     const refreshData = () => {
       const orders = getSavedOrders();
@@ -69,19 +116,40 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ initialOrderId = 'PU
         if (matching) setCurrentOrder(matching);
       }
     };
+
     window.addEventListener('punify_orders_updated', refreshData);
-    return () => window.removeEventListener('punify_orders_updated', refreshData);
+    window.addEventListener('storage', refreshData);
+
+    let channel: BroadcastChannel | null = null;
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        channel = new BroadcastChannel('punify_orders_sync');
+        channel.onmessage = () => {
+          refreshData();
+        };
+      }
+    } catch {
+      // ignore
+    }
+
+    return () => {
+      window.removeEventListener('punify_orders_updated', refreshData);
+      window.removeEventListener('storage', refreshData);
+      if (channel) {
+        channel.close();
+      }
+    };
   }, [searchId]);
 
   const handleSearch = (idToSearch: string) => {
-    const found = getOrderById(idToSearch);
-    setSearchId(idToSearch);
-    if (found) {
-      setCurrentOrder(found);
-      setFeedbackMsg('');
-    } else {
-      setFeedbackMsg(`Order with ID "${idToSearch}" was not found.`);
-    }
+    if (!idToSearch.trim()) return;
+    const cleanId = idToSearch.trim().toUpperCase();
+    const found = getOrderById(cleanId) || resolveOrderOrMock(cleanId);
+    setSearchId(found.orderId);
+    setCurrentOrder(found);
+    setAllOrders(getSavedOrders());
+    setFeedbackMsg(`✓ Displaying live tracking for "${found.orderId}"`);
+    setTimeout(() => setFeedbackMsg(''), 3000);
   };
 
   const handleAdvanceStatus = (newStatus: OrderStatus, note: string, courier?: string) => {
@@ -98,9 +166,23 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ initialOrderId = 'PU
     if (updated) {
       setCurrentOrder({ ...updated });
       setAllOrders(getSavedOrders());
-      setFeedbackMsg(`✓ Order status for "${currentOrder.orderId}" updated: "${newStatus}"!`);
-      setTimeout(() => setFeedbackMsg(''), 3000);
+      setFeedbackMsg(`✓ Order status updated: "${newStatus.replace('_', ' ')}"!`);
+      setTimeout(() => setFeedbackMsg(''), 3500);
     }
+  };
+
+  const handleCopyShareLink = () => {
+    if (!currentOrder) return;
+    const encoded = encodeOrderForUrl(currentOrder);
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://punify.netlify.app';
+    const shareUrl = `${origin}/#tracker?id=${currentOrder.orderId}${encoded ? `&d=${encoded}` : ''}`;
+    navigator.clipboard.writeText(shareUrl);
+    setCopiedLink(true);
+    setFeedbackMsg(`✓ Shareable tracking link copied! Anyone opening this link will see this order.`);
+    setTimeout(() => {
+      setCopiedLink(false);
+      setFeedbackMsg('');
+    }, 4000);
   };
 
   const getStepNumber = (status: OrderStatus): number => {
@@ -133,13 +215,13 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ initialOrderId = 'PU
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 pb-4 border-b border-slate-100 gap-4">
           <div>
             <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider block mb-1">
-              Live Order Tracker & Operational Desk
+              Live Order Tracker & Campus Dispatch
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               Real-Time Order Tracking
             </h2>
             <p className="text-sm text-slate-500 mt-1">
-              Directly synced to President University printing queues and student housing couriers.
+              Directly synced with President University print operators and dorm couriers.
             </p>
 
             {/* Mode Switcher Tabs */}
@@ -170,7 +252,7 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ initialOrderId = 'PU
             </div>
           </div>
 
-          {/* Search Input */}
+          {/* Search Input Form */}
           <form 
             onSubmit={(e) => {
               e.preventDefault();
@@ -190,34 +272,35 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ initialOrderId = 'PU
             </div>
             <button
               type="submit"
-              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs"
+              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors"
             >
               Track
             </button>
           </form>
         </div>
 
-        {/* Quick select existing stored orders */}
+        {/* Quick select active orders */}
         <div className="mb-6 flex flex-wrap items-center gap-2 text-xs">
-          <span className="text-slate-500">Select Stored Order:</span>
-          {allOrders.map((ord) => (
+          <span className="text-slate-500 font-medium">Active Order Queue:</span>
+          {allOrders.slice(0, 6).map((ord) => (
             <button
               key={ord.orderId}
               onClick={() => handleSearch(ord.orderId)}
-              className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
-                currentOrder?.orderId === ord.orderId
-                  ? 'bg-blue-600 text-white font-bold'
+              className={`px-2.5 py-1 rounded text-xs font-mono transition-colors flex items-center space-x-1.5 ${
+                currentOrder?.orderId.toUpperCase() === ord.orderId.toUpperCase()
+                  ? 'bg-blue-600 text-white font-bold shadow-xs'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
-              {ord.orderId} ({ord.customerName.split(' ')[0]})
+              <span>{ord.orderId}</span>
+              <span className="text-[10px] opacity-75">({ord.customerName.split(' ')[0]})</span>
             </button>
           ))}
         </div>
 
         {feedbackMsg && (
-          <div className="mb-4 p-3 rounded-lg bg-blue-50 text-blue-900 text-xs flex items-center justify-between">
-            <span>{feedbackMsg}</span>
+          <div className="mb-4 p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 text-xs flex items-center justify-between">
+            <span className="font-medium">{feedbackMsg}</span>
           </div>
         )}
 
@@ -237,6 +320,15 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ initialOrderId = 'PU
                     }`}>
                       {currentOrder.paymentStatus === 'paid' ? 'PAID (QRIS)' : 'Payment Pending'}
                     </span>
+                    <button
+                      type="button"
+                      onClick={handleCopyShareLink}
+                      className="px-2 py-0.5 rounded bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-[11px] font-medium flex items-center space-x-1 transition-colors"
+                      title="Copy shareable link for anyone to track this order"
+                    >
+                      {copiedLink ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3 text-slate-500" />}
+                      <span>{copiedLink ? 'Copied' : 'Share Link'}</span>
+                    </button>
                   </div>
                   <h3 className="text-base font-bold text-slate-900 mt-1">{currentOrder.serviceName}</h3>
                   <p className="text-xs text-slate-600 mt-0.5">{currentOrder.optionsSummary}</p>
@@ -329,7 +421,7 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ initialOrderId = 'PU
                   <div className="flex items-center space-x-2">
                     <Wrench className="w-4 h-4 text-blue-700" />
                     <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                      Print Desk & Delivery Operations (Admin Dashboard)
+                      Print Desk & Delivery Operations (Operator Controls)
                     </span>
                   </div>
                   <div className="flex items-center space-x-2 text-xs">
@@ -377,7 +469,7 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ initialOrderId = 'PU
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 text-xs">
                     <button
-                      onClick={() => handleAdvanceStatus('placed', 'File and order format verified by admin')}
+                      onClick={() => handleAdvanceStatus('placed', 'File and order format verified by print operator')}
                       className={`p-2.5 rounded-lg border text-left transition-colors ${
                         currentOrder.status === 'placed' ? 'bg-blue-600 text-white font-bold' : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-800'
                       }`}
@@ -440,9 +532,11 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ initialOrderId = 'PU
                   <div>
                     <h4 className="font-bold text-slate-900">
                       {currentOrder.status === 'ready_pickup' 
-                        ? 'Order Has Arrived at Your Dormitory!' 
+                        ? 'Order Has Arrived at Your Dormitory Lobby!' 
                         : currentOrder.status === 'in_production'
-                        ? 'Currently Printing at Production Desk'
+                        ? 'Currently Printing & Binding at Production Desk'
+                        : currentOrder.status === 'quality_check'
+                        ? 'Quality Inspection & Protective Packaging'
                         : 'Order Queued in Campus System'}
                     </h4>
                     <p className="text-slate-500 text-[11px] mt-0.5">
@@ -456,14 +550,14 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ initialOrderId = 'PU
                     href={`https://wa.me/${ADMIN_WHATSAPP_INTL}?text=${encodeURIComponent(`Hello PUNIFY Admin, I would like to check on my order:\n• Order ID: ${currentOrder.orderId}\n• Name: ${currentOrder.customerName}\n• Drop Point: ${currentOrder.dormName} (${currentOrder.roomNumber})`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-2xs flex items-center space-x-1"
+                    className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-2xs flex items-center space-x-1 transition-colors"
                   >
                     <MessageCircle className="w-3.5 h-3.5" />
                     <span>Chat Admin WA</span>
                   </a>
                   <button
                     onClick={() => setViewMode('operator')}
-                    className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-2xs flex items-center space-x-1"
+                    className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-2xs flex items-center space-x-1 transition-colors"
                   >
                     <Wrench className="w-3.5 h-3.5" />
                     <span>Open Operator Panel</span>

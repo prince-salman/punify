@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { CalculatedInvoice, OrderState } from '../types/order';
 import { DORM_LOCATIONS } from '../data/dorms';
-import { updateOrderStatus } from '../utils/orderStorage';
+import { updateOrderStatus, getOrderById, encodeOrderForUrl } from '../utils/orderStorage';
 import { sounds } from '../utils/audio';
 import { ADMIN_WHATSAPP_INTL } from '../data/contact';
 
@@ -61,9 +61,11 @@ export const OrderSummaryModal: React.FC<OrderSummaryModalProps> = ({
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
+  const currentSavedOrder = getOrderById(invoice.orderId);
+  const encodedPayload = currentSavedOrder ? encodeOrderForUrl(currentSavedOrder) : '';
   const trackingUrl = typeof window !== 'undefined' 
-    ? `${window.location.origin}/#tracker?id=${invoice.orderId}`
-    : `http://localhost:3000/#tracker?id=${invoice.orderId}`;
+    ? `${window.location.origin}/#tracker?id=${invoice.orderId}${encodedPayload ? `&d=${encodedPayload}` : ''}`
+    : `https://punify.netlify.app/#tracker?id=${invoice.orderId}`;
 
   const waMessage = encodeURIComponent(
 `*PUNIFY ORDER CONFIRMATION*

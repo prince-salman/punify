@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { ServicesGrid } from './components/ServicesGrid';
@@ -15,6 +15,22 @@ export function App() {
   const [activeModalInvoice, setActiveModalInvoice] = useState<CalculatedInvoice | null>(null);
   const [activeOrderState, setActiveOrderState] = useState<OrderState | null>(null);
   const [trackedOrderId, setTrackedOrderId] = useState<string>('PUN-2026-4821');
+
+  // Handle deep-link scrolling if visiting with #tracker or ?track= / ?id=
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash;
+      const search = window.location.search;
+      if (hash.includes('tracker') || search.includes('track') || search.includes('id=')) {
+        setTimeout(() => {
+          const element = document.getElementById('tracker');
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 350);
+      }
+    }
+  }, []);
 
   const handleSelectServiceFromGrid = (serviceId: ServiceId) => {
     setSelectedServiceId(serviceId);

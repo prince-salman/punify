@@ -149,7 +149,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
     }
 
     let countMultiplier = 1;
-    if (['printing', 'photocopy', 'typing', 'translate'].includes(currentService.id)) {
+    if (['printing', 'photocopy'].includes(currentService.id)) {
       countMultiplier = Math.max(1, pageCount);
     } else {
       countMultiplier = Math.max(1, quantity);
@@ -196,7 +196,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
           isPdf: processed.isPdf
         });
 
-        if (processed.isPdf && ['printing', 'photocopy', 'typing', 'translate'].includes(currentService.id)) {
+        if (processed.isPdf && ['printing', 'photocopy'].includes(currentService.id)) {
           setPageCount(processed.detectedPages);
           setFileNotification(`✓ PDF document detected: ${processed.detectedPages} pages synced to price calculator!`);
           sounds.playNotificationPing();
@@ -226,7 +226,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
     setFormError('');
 
     const selectedDorm = DORM_LOCATIONS.find((d) => d.id === dormId);
-    const orderQty = ['printing', 'photocopy', 'typing', 'translate'].includes(currentService.id) ? pageCount : quantity;
+    const orderQty = ['printing', 'photocopy'].includes(currentService.id) ? pageCount : quantity;
 
     const orderState: OrderState = {
       serviceId: activeServiceId,
@@ -277,7 +277,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
         {
           status: 'placed',
           timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB',
-          note: `Order submitted by student (${orderQty} ${['printing', 'photocopy', 'typing', 'translate'].includes(currentService.id) ? 'pages' : 'pcs'})`
+          note: `Order submitted by student (${orderQty} ${['printing', 'photocopy'].includes(currentService.id) ? 'pages' : 'pcs'})`
         }
       ]
     };
@@ -477,7 +477,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
             <div className="flex items-center justify-between py-3 border-t border-b border-slate-100">
               <div>
                 <span className="text-xs font-semibold text-slate-900 block">
-                  {['printing', 'photocopy', 'typing', 'translate'].includes(currentService.id)
+                  {['printing', 'photocopy'].includes(currentService.id)
                     ? 'Page Count'
                     : 'Quantity (Pcs)'}
                 </span>
@@ -492,7 +492,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
                 <button
                   type="button"
                   onClick={() => {
-                    if (['printing', 'photocopy', 'typing', 'translate'].includes(currentService.id)) {
+                    if (['printing', 'photocopy'].includes(currentService.id)) {
                       setPageCount((p) => Math.max(1, p - 1));
                     } else {
                       setQuantity((q) => Math.max(1, q - 1));
@@ -506,10 +506,10 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
                   type="number"
                   min="1"
                   step="1"
-                  value={['printing', 'photocopy', 'typing', 'translate'].includes(currentService.id) ? pageCount : quantity}
+                  value={['printing', 'photocopy'].includes(currentService.id) ? pageCount : quantity}
                   onChange={(e) => {
                     const val = parseInt(e.target.value) || 1;
-                    if (['printing', 'photocopy', 'typing', 'translate'].includes(currentService.id)) {
+                    if (['printing', 'photocopy'].includes(currentService.id)) {
                       setPageCount(Math.max(1, val));
                     } else {
                       setQuantity(Math.max(1, val));
@@ -520,7 +520,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
                 <button
                   type="button"
                   onClick={() => {
-                    if (['printing', 'photocopy', 'typing', 'translate'].includes(currentService.id)) {
+                    if (['printing', 'photocopy'].includes(currentService.id)) {
                       setPageCount((p) => p + 1);
                     } else {
                       setQuantity((q) => q + 1);
@@ -674,7 +674,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
                 <div className="py-2 flex justify-between text-slate-600">
                   <span>Volume</span>
                   <span className="font-mono font-semibold text-slate-900">
-                    {['printing', 'photocopy', 'typing', 'translate'].includes(currentService.id)
+                    {['printing', 'photocopy'].includes(currentService.id)
                       ? `${pageCount} Pages`
                       : `${quantity} Pcs`}
                   </span>

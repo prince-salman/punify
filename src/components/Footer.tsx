@@ -16,20 +16,17 @@ export const Footer: React.FC = () => {
               "All Student Services, One Platform. — Your needs, unified."
             </p>
             <p className="text-slate-500 text-xs leading-relaxed max-w-sm">
-              Integrated student services for President University: academic printing, duplication, orientation name tags, assignment typing, custom acrylic merchandise, and journal translation in Cikarang.
+              Integrated student services for President University: academic document printing, coursepack duplication, and custom orientation name tags in Cikarang.
             </p>
           </div>
 
-          {/* 6 Services list */}
+          {/* Core Services list */}
           <div className="space-y-2.5">
-            <h4 className="text-slate-900 font-semibold text-xs uppercase tracking-wider">6 Services</h4>
+            <h4 className="text-slate-900 font-semibold text-xs uppercase tracking-wider">Services</h4>
             <ul className="space-y-1.5 text-xs text-slate-600">
               <li><a href="#order-portal" className="hover:text-blue-600">Thesis & Document Printing</a></li>
               <li><a href="#order-portal" className="hover:text-blue-600">Coursepack Photocopying</a></li>
               <li><a href="#order-portal" className="hover:text-blue-600">Event & Orientation Name Tags</a></li>
-              <li><a href="#order-portal" className="hover:text-blue-600">Assignment Typing & Formatting</a></li>
-              <li><a href="#order-portal" className="hover:text-blue-600">Custom Acrylic Keychains</a></li>
-              <li><a href="#order-portal" className="hover:text-blue-600">Academic Translation (ID ⇄ EN)</a></li>
             </ul>
           </div>
 

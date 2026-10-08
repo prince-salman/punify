@@ -22,7 +22,7 @@ export const ServicesGrid: React.FC<ServicesGridProps> = ({
             Service Catalog
           </span>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            6 Campus & Academic Services
+            Academic & Campus Services
           </h2>
           <p className="text-sm text-slate-500 mt-1">
             Click on any service to customize options, preview pages, and compute your total cost.

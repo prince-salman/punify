@@ -376,22 +376,6 @@ export const resolveOrderOrMock = (orderId: string): SavedOrder => {
       fee: 22000, 
       qty: 45, 
       file: 'Calculus_Exam_Review_Set.pdf' 
-    },
-    { 
-      id: 'keychain' as ServiceId, 
-      name: 'Custom Acrylic Keychain', 
-      summary: 'Double-Sided 3mm Acrylic • Stainless Ring Clip', 
-      fee: 35000, 
-      qty: 2, 
-      file: 'PUMA_Mechanical_Keychain.png' 
-    },
-    { 
-      id: 'typing' as ServiceId, 
-      name: 'Document Typing & Formatting', 
-      summary: 'IEEE Journal Layout Formatting • Proofreading', 
-      fee: 55000, 
-      qty: 14, 
-      file: 'IEEE_Conference_Draft.docx' 
     }
   ];
 

@@ -75,7 +75,7 @@ export const OrderSummaryModal: React.FC<OrderSummaryModalProps> = ({
 *Student Name:* ${orderState.customerName}
 *WhatsApp:* ${orderState.customerPhone}
 *Service:* ${invoice.serviceName}
-*Volume:* ${['printing', 'photocopy', 'typing', 'translate'].includes(orderState.serviceId) ? `${orderState.pageCount} Pages` : `${orderState.quantity} Pcs`}
+*Volume:* ${['printing', 'photocopy'].includes(orderState.serviceId) ? `${orderState.pageCount} Pages` : `${orderState.quantity} Pcs`}
 *File:* ${orderState.fileName || 'Send via WhatsApp'}
 *Drop Point:* ${selectedDorm?.name || 'PresUniv Hub'} (${orderState.customerRoomNumber || 'Lobby Desk'})
 *Notes:* ${orderState.notes || '-'}

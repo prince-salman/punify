@@ -136,7 +136,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenTracker }) =>
               onClick={() => setMobileMenuOpen(false)}
               className="px-3 py-2 rounded-lg bg-slate-50 text-slate-800"
             >
-              6 Academic Services
+              Academic Services
             </a>
             <a 
               href="#order-portal" 

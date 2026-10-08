@@ -24,10 +24,10 @@ export const DormSelector: React.FC<DormSelectorProps> = ({
         <label className="text-xs font-semibold text-slate-800 block mb-1.5 flex items-center justify-between">
           <span className="flex items-center gap-1.5">
             <Building2 className="w-3.5 h-3.5 text-blue-600" />
-            <span>Pilih Titik Antar Asrama / Kampus PresUniv</span>
+            <span>Select Dorm Drop-off Point / PresUniv Campus</span>
           </span>
           <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-            Dorm Drop Gratis
+            Free Dorm Delivery
           </span>
         </label>
         
@@ -38,7 +38,7 @@ export const DormSelector: React.FC<DormSelectorProps> = ({
         >
           {DORM_LOCATIONS.map((dorm) => (
             <option key={dorm.id} value={dorm.id}>
-              {dorm.name} ({dorm.deliveryFee === 0 ? 'Gratis' : `+Rp ${dorm.deliveryFee.toLocaleString('id-ID')}`})
+              {dorm.name} ({dorm.deliveryFee === 0 ? 'Free' : `+Rp ${dorm.deliveryFee.toLocaleString('id-ID')}`})
             </option>
           ))}
         </select>
@@ -54,13 +54,13 @@ export const DormSelector: React.FC<DormSelectorProps> = ({
       {/* Room Number / Notes */}
       <div>
         <label className="text-xs font-semibold text-slate-800 block mb-1">
-          Nomor Kamar Asrama / Meja Lobby
+          Dorm Room Number / Lobby Security Desk
         </label>
         <input
           type="text"
           value={roomNumber}
           onChange={(e) => onChangeRoomNumber(e.target.value)}
-          placeholder="Misal: Tower 2 Kamar 408 atau Titip Satpam Lobby"
+          placeholder="e.g. Tower 2 Room 408 or Drop at Lobby Security Desk"
           className="w-full px-3.5 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 text-xs focus:outline-none focus:border-blue-600"
         />
       </div>

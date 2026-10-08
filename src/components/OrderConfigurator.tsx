@@ -173,7 +173,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
       discount,
       grandTotal,
       estimatedCompletion: speed.includes('express') || speed.includes('rush') 
-        ? 'Kilat Express (30 - 60 Menit)' 
+        ? 'Express Rush (30 - 60 Mins)' 
         : currentService.turnaroundTime,
     };
   };
@@ -197,16 +197,16 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
 
         if (processed.isPdf && ['printing', 'photocopy', 'typing', 'translate'].includes(currentService.id)) {
           setPageCount(processed.detectedPages);
-          setFileNotification(`✓ Berkas PDF terdeteksi: ${processed.detectedPages} Halaman otomatis disinkronkan ke kalkulator harga!`);
+          setFileNotification(`✓ PDF document detected: ${processed.detectedPages} pages synced to price calculator!`);
           sounds.playNotificationPing();
         } else {
-          setFileNotification(`✓ File "${processed.name}" (${processed.size}) siap diproses.`);
+          setFileNotification(`✓ File "${processed.name}" (${processed.size}) attached successfully.`);
           sounds.playNotificationPing();
         }
         setFormError('');
       } catch (err) {
         console.warn('File upload error', err);
-        setFormError('Gagal memproses berkas.');
+        setFormError('Failed to process file.');
       } finally {
         setIsUploading(false);
       }
@@ -215,11 +215,11 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
 
   const handleProceedOrder = () => {
     if (!customerName.trim()) {
-      setFormError('Nama lengkap belum diisi.');
+      setFormError('Please enter your full name.');
       return;
     }
     if (!customerPhone.trim()) {
-      setFormError('Nomor WhatsApp belum diisi.');
+      setFormError('Please enter your WhatsApp number.');
       return;
     }
     setFormError('');
@@ -256,17 +256,17 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
       serviceId: activeServiceId,
       serviceName: invoice.serviceName,
       optionsSummary: [
-        colorMode ? `Tinta: ${colorMode}` : '',
-        paperType ? `Kertas: ${paperType}` : '',
-        bindingType !== 'none' ? `Jilid: ${bindingType}` : '',
-        speed ? `Kecepatan: ${speed}` : ''
+        colorMode ? `Ink: ${colorMode}` : '',
+        paperType ? `Paper: ${paperType}` : '',
+        bindingType !== 'none' ? `Binding: ${bindingType}` : '',
+        speed ? `Turnaround: ${speed}` : ''
       ].filter(Boolean).join(' • '),
       fileName: uploadedFile?.name,
       fileSize: uploadedFile?.size,
       fileDataUrl: uploadedFile?.dataUrl,
       dormId,
       dormName: selectedDorm?.name || 'PresUniv Hub',
-      roomNumber: roomNumber || 'Lobby Utama',
+      roomNumber: roomNumber || 'Lobby Desk',
       notes,
       quantityOrPages: orderQty,
       totalAmount: invoice.grandTotal,
@@ -276,7 +276,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
         {
           status: 'placed',
           timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB',
-          note: `Pesanan dibuat oleh mahasiswa (${orderQty} ${['printing', 'photocopy', 'typing', 'translate'].includes(currentService.id) ? 'halaman' : 'pcs'})`
+          note: `Order submitted by student (${orderQty} ${['printing', 'photocopy', 'typing', 'translate'].includes(currentService.id) ? 'pages' : 'pcs'})`
         }
       ]
     };
@@ -309,13 +309,13 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
         {/* Section Header */}
         <div className="mb-8">
           <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider block mb-1">
-            Form Pemesanan
+            Order Portal
           </span>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Kalkulator & Form Order
+            Calculator & Order Form
           </h2>
           <p className="text-sm text-slate-500 mt-1">
-            Sesuaikan detail dokumen, masukkan nama dan lokasi kamar asrama untuk konfirmasi pesanan.
+            Customize document options, specify page counts, and choose your dorm drop-off point.
           </p>
         </div>
 
@@ -346,7 +346,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
             {currentService.options.colorModes && (
               <div>
                 <label className="text-xs font-semibold text-slate-800 block mb-2">
-                  Pilihan Tinta & Warna
+                  Ink & Color Selection
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {currentService.options.colorModes.map((opt) => (
@@ -362,7 +362,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
                     >
                       {opt.name.split(' (')[0]}
                       <span className="text-[10px] text-slate-500 block">
-                        {opt.priceDelta === 0 ? 'Harga Dasar' : `+Rp ${opt.priceDelta.toLocaleString('id-ID')}`}
+                        {opt.priceDelta === 0 ? 'Base Rate' : `+Rp ${opt.priceDelta.toLocaleString('id-ID')}`}
                       </span>
                     </button>
                   ))}
@@ -374,7 +374,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
             {currentService.options.paperTypes && (
               <div>
                 <label className="text-xs font-semibold text-slate-800 block mb-2">
-                  Ukuran & Jenis Kertas
+                  Paper Size & Weight
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {currentService.options.paperTypes.map((opt) => (
@@ -390,7 +390,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
                     >
                       {opt.name}
                       <span className="text-[10px] text-slate-500 block">
-                        {opt.priceDelta === 0 ? 'Standar' : `+Rp ${opt.priceDelta.toLocaleString('id-ID')}`}
+                        {opt.priceDelta === 0 ? 'Standard' : `+Rp ${opt.priceDelta.toLocaleString('id-ID')}`}
                       </span>
                     </button>
                   ))}
@@ -402,7 +402,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
             {currentService.options.materialTypes && (
               <div>
                 <label className="text-xs font-semibold text-slate-800 block mb-2">
-                  Spesifikasi Bahan & Pilihan
+                  Material Specification
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {currentService.options.materialTypes.map((opt) => (
@@ -418,7 +418,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
                     >
                       {opt.name}
                       <span className="text-[10px] text-slate-500 block">
-                        {opt.priceDelta === 0 ? 'Standar' : `+Rp ${opt.priceDelta.toLocaleString('id-ID')}`}
+                        {opt.priceDelta === 0 ? 'Standard' : `+Rp ${opt.priceDelta.toLocaleString('id-ID')}`}
                       </span>
                     </button>
                   ))}
@@ -430,7 +430,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
             {currentService.options.bindingTypes && (
               <div>
                 <label className="text-xs font-semibold text-slate-800 block mb-1.5">
-                  Opsi Penjilidan Dokumen
+                  Document Binding Options
                 </label>
                 <select
                   value={bindingType}
@@ -439,7 +439,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
                 >
                   {currentService.options.bindingTypes.map((opt) => (
                     <option key={opt.id} value={opt.id}>
-                      {opt.name} ({opt.priceDelta === 0 ? 'Tanpa Jilid' : `+Rp ${opt.priceDelta.toLocaleString('id-ID')}`})
+                      {opt.name} ({opt.priceDelta === 0 ? 'No Binding' : `+Rp ${opt.priceDelta.toLocaleString('id-ID')}`})
                     </option>
                   ))}
                 </select>
@@ -450,7 +450,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
             {currentService.options.speeds && (
               <div>
                 <label className="text-xs font-semibold text-slate-800 block mb-1.5">
-                  Waktu Pengerjaan
+                  Production Turnaround Speed
                 </label>
                 <div className="flex gap-2">
                   {currentService.options.speeds.map((opt) => (
@@ -476,13 +476,13 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
               <div>
                 <span className="text-xs font-semibold text-slate-900 block">
                   {['printing', 'photocopy', 'typing', 'translate'].includes(currentService.id)
-                    ? 'Jumlah Halaman'
-                    : 'Jumlah Item (Pcs)'}
+                    ? 'Page Count'
+                    : 'Quantity (Pcs)'}
                 </span>
                 <span className="text-[11px] text-slate-500">
                   {pageCount >= 50 && ['printing', 'photocopy'].includes(currentService.id)
-                    ? 'Diskon 5% otomatis aktif untuk ≥ 50 halaman'
-                    : 'Gunakan tombol atau ketik langsung angka'}
+                    ? 'Automatic 5% bulk discount applied for ≥ 50 pages'
+                    : 'Use stepper buttons or enter count directly'}
                 </span>
               </div>
 
@@ -534,11 +534,11 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-semibold text-slate-800 block">
-                  Unggah File Berkas (Deteksi Halaman Otomatis untuk PDF)
+                  Upload Document File (Automatic PDF Page Detection)
                 </label>
                 {isUploading && (
                   <span className="text-[11px] text-blue-600 animate-pulse font-medium">
-                    Menganalisis berkas...
+                    Analyzing document pages...
                   </span>
                 )}
               </div>
@@ -569,7 +569,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
                         {uploadedFile.detectedPages && (
                           <>
                             <span>•</span>
-                            <span className="text-blue-700 font-semibold">{uploadedFile.detectedPages} Halaman</span>
+                            <span className="text-blue-700 font-semibold">{uploadedFile.detectedPages} Pages</span>
                           </>
                         )}
                         {uploadedFile.dataUrl && (
@@ -580,7 +580,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
                               download={uploadedFile.name}
                               className="text-blue-600 hover:underline font-sans font-medium"
                             >
-                              Unduh / Cek File
+                              Preview / Download File
                             </a>
                           </>
                         )}
@@ -594,7 +594,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
                       setFileNotification('');
                     }}
                     className="text-slate-400 hover:text-rose-600 p-1 flex-shrink-0"
-                    title="Hapus file"
+                    title="Remove file"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -603,8 +603,8 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
                 <label className="flex items-center space-x-2 py-3 px-3.5 rounded-lg border border-dashed border-slate-300 hover:border-blue-500 hover:bg-blue-50/30 bg-white cursor-pointer text-xs text-slate-600 transition-colors">
                   <UploadCloud className="w-4 h-4 text-blue-600 flex-shrink-0" />
                   <div className="flex-1">
-                    <span className="font-semibold text-slate-800">Pilih berkas dokumen dari laptop/HP</span>
-                    <span className="block text-[11px] text-slate-400">PDF, Word, Excel, JPG, PNG (Halaman PDF dihitung otomatis)</span>
+                    <span className="font-semibold text-slate-800">Select document file from device</span>
+                    <span className="block text-[11px] text-slate-400">PDF, Word, Excel, JPG, PNG (PDF page count auto-detected)</span>
                   </div>
                   <input
                     type="file"
@@ -627,13 +627,13 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
             {/* Notes */}
             <div>
               <label className="text-xs font-semibold text-slate-800 block mb-1">
-                Catatan Tambahan untuk Petugas Print
+                Additional Notes for Production Desk
               </label>
               <input
                 type="text"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Contoh: Tolong rangkap 2, jilid mika warna biru, dsb."
+                placeholder="e.g. 2 copies, blue mica cover, double-sided, etc."
                 className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:border-blue-600"
               />
             </div>
@@ -646,7 +646,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
               
               <div>
                 <span className="text-xs font-mono font-semibold text-blue-700 uppercase tracking-wider block">
-                  Rincian Biaya
+                  Price Breakdown
                 </span>
                 <h3 className="text-lg font-bold text-slate-900">
                   {invoice.serviceName}
@@ -659,12 +659,12 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
               {/* Line items list with subtle dividers */}
               <div className="divide-y divide-slate-100 text-xs">
                 <div className="py-2 flex justify-between text-slate-600">
-                  <span>Tarif Satuan</span>
+                  <span>Base Unit Price</span>
                   <span className="font-mono text-slate-900">Rp {invoice.basePrice.toLocaleString('id-ID')}</span>
                 </div>
                 {invoice.optionsTotal > 0 && (
                   <div className="py-2 flex justify-between text-slate-600">
-                    <span>Opsi Tambahan</span>
+                    <span>Custom Add-ons</span>
                     <span className="font-mono text-slate-900">+Rp {invoice.optionsTotal.toLocaleString('id-ID')}</span>
                   </div>
                 )}
@@ -672,19 +672,19 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
                   <span>Volume</span>
                   <span className="font-mono font-semibold text-slate-900">
                     {['printing', 'photocopy', 'typing', 'translate'].includes(currentService.id)
-                      ? `${pageCount} Halaman`
+                      ? `${pageCount} Pages`
                       : `${quantity} Pcs`}
                   </span>
                 </div>
                 <div className="py-2 flex justify-between text-slate-600">
-                  <span>Ongkir Drop Asrama</span>
+                  <span>Dorm Delivery Fee</span>
                   <span className={invoice.deliveryFee === 0 ? 'text-emerald-700 font-semibold' : 'font-mono text-slate-900'}>
-                    {invoice.deliveryFee === 0 ? 'GRATIS' : `Rp ${invoice.deliveryFee.toLocaleString('id-ID')}`}
+                    {invoice.deliveryFee === 0 ? 'FREE' : `Rp ${invoice.deliveryFee.toLocaleString('id-ID')}`}
                   </span>
                 </div>
                 {invoice.discount > 0 && (
                   <div className="py-2 flex justify-between text-emerald-700">
-                    <span>Diskon Halaman (5%)</span>
+                    <span>Volume Discount (5%)</span>
                     <span className="font-mono">-Rp {invoice.discount.toLocaleString('id-ID')}</span>
                   </div>
                 )}
@@ -692,7 +692,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
 
               {/* Total Calculation */}
               <div className="pt-2 flex items-baseline justify-between border-t border-slate-200">
-                <span className="text-xs font-medium text-slate-500">Total Pembayaran:</span>
+                <span className="text-xs font-medium text-slate-500">Total Amount:</span>
                 <span className="text-2xl font-mono font-extrabold text-slate-950">
                   Rp {invoice.grandTotal.toLocaleString('id-ID')}
                 </span>
@@ -702,20 +702,20 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
               <div className="space-y-2.5 pt-2 text-xs">
                 <div>
                   <label className="text-[11px] font-semibold text-slate-800 block mb-1">
-                    Nama Pemesan *
+                    Student Name *
                   </label>
                   <input
                     type="text"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
-                    placeholder="Nama Lengkap Mahasiswa"
+                    placeholder="Full Student Name"
                     className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 text-xs focus:outline-none focus:border-blue-600"
                   />
                 </div>
 
                 <div>
                   <label className="text-[11px] font-semibold text-slate-800 block mb-1">
-                    Nomor WhatsApp *
+                    WhatsApp Number *
                   </label>
                   <input
                     type="tel"
@@ -739,12 +739,12 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
                 onClick={handleProceedOrder}
                 className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition-colors flex items-center justify-center space-x-1.5 shadow-xs"
               >
-                <span>Konfirmasi & Lanjut Bayar</span>
+                <span>Confirm & Proceed to Payment</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
               <p className="text-[11px] text-slate-500 text-center">
-                Pesanan tersimpan di sistem, dapat dilacak secara live & rincian siap dikirim ke WhatsApp admin.
+                Orders are saved in the system, trackable live, and details forwarded to the admin WhatsApp.
               </p>
 
             </div>

@@ -19,17 +19,17 @@ export const ServicesGrid: React.FC<ServicesGridProps> = ({
         {/* Header */}
         <div className="mb-8">
           <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider block mb-1">
-            Daftar Layanan
+            Service Catalog
           </span>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            6 Layanan Akademik & Kampus
+            6 Campus & Academic Services
           </h2>
           <p className="text-sm text-slate-500 mt-1">
-            Klik pada layanan untuk mengonfigurasi berkas dan menghitung total biaya di formulir pemesanan.
+            Click on any service to customize options, preview pages, and compute your total cost.
           </p>
         </div>
 
-        {/* Seamless Clean List (No boxes, pure clean typography with dividers) */}
+        {/* Seamless Clean List */}
         <div className="divide-y divide-slate-100 border-t border-b border-slate-100">
           {PUNIFY_SERVICES.map((service, index) => {
             const isSelected = selectedServiceId === service.id;
@@ -60,14 +60,14 @@ export const ServicesGrid: React.FC<ServicesGridProps> = ({
                   </p>
                   <div className="pl-6 pt-0.5 flex items-center gap-1.5 text-[11px] text-slate-500">
                     <Clock className="w-3 h-3 text-slate-400" />
-                    <span>Waktu pengerjaan: {service.turnaroundTime}</span>
+                    <span>Turnaround: {service.turnaroundTime}</span>
                   </div>
                 </div>
 
                 {/* Right: Pricing & CTA */}
                 <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center pl-6 sm:pl-0 pt-2 sm:pt-0 gap-1 flex-shrink-0">
                   <div className="text-left sm:text-right">
-                    <span className="text-[11px] text-slate-400 block">Mulai dari</span>
+                    <span className="text-[11px] text-slate-400 block">Starting from</span>
                     <span className="text-sm font-bold text-slate-900 font-mono">
                       Rp {service.basePrice.toLocaleString('id-ID')}
                     </span>
@@ -81,7 +81,7 @@ export const ServicesGrid: React.FC<ServicesGridProps> = ({
                       isSelected ? 'text-blue-700 font-bold' : 'text-slate-500 hover:text-blue-600'
                     }`}
                   >
-                    <span>{isSelected ? 'Layanan Terpilih ✓' : 'Pilih & Hitung'}</span>
+                    <span>{isSelected ? 'Selected ✓' : 'Configure & Order'}</span>
                     {!isSelected && <ArrowRight className="w-3 h-3" />}
                   </button>
                 </div>

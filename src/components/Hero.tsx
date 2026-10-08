@@ -24,13 +24,13 @@ export const Hero: React.FC<HeroProps> = ({ onStartOrder, onExploreServices }) =
 
           {/* Strong Human Headline */}
           <h1 className="text-4xl sm:text-6xl font-extrabold text-slate-950 tracking-tight leading-[1.12]">
-            Print tugas, fotokopi materi, dan bikin name tag. <br />
-            <span className="text-blue-600">Langsung diantar ke asrama.</span>
+            Print coursework, bind theses, and craft custom merch. <br />
+            <span className="text-blue-600">Delivered right to your dorm lobby.</span>
           </h1>
 
           {/* Natural Human Copy */}
           <p className="text-lg text-slate-600 leading-relaxed font-normal">
-            PUNIFY memudahkan mahasiswa President University mengakses seluruh kebutuhan akademik dan kepanitiaan dalam satu tempat. Pesan secara online, berkas dicetak rapi, dan kurir kami antar langsung ke meja lobby dormitory kamu.
+            PUNIFY empowers President University students to handle all academic and event printing needs seamlessly. Configure your order online, get instant transparent pricing, and our campus couriers deliver straight to your dorm desk.
           </p>
 
           {/* Action Row */}
@@ -39,7 +39,7 @@ export const Hero: React.FC<HeroProps> = ({ onStartOrder, onExploreServices }) =
               onClick={onStartOrder}
               className="px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition-colors flex items-center space-x-2 shadow-sm"
             >
-              <span>Mulai Order & Hitung Tarif</span>
+              <span>Start Order & Calculate Price</span>
               <ArrowRight className="w-4 h-4" />
             </button>
 
@@ -47,7 +47,7 @@ export const Hero: React.FC<HeroProps> = ({ onStartOrder, onExploreServices }) =
               onClick={onExploreServices}
               className="px-5 py-3.5 text-slate-700 hover:text-blue-600 font-semibold text-sm transition-colors"
             >
-              Lihat 6 Layanan ➔
+              Explore 6 Services ➔
             </button>
           </div>
 
@@ -55,15 +55,15 @@ export const Hero: React.FC<HeroProps> = ({ onStartOrder, onExploreServices }) =
           <div className="pt-8 border-t border-slate-100 flex flex-wrap items-center gap-y-3 gap-x-8 text-xs text-slate-600">
             <div className="flex items-center space-x-2">
               <Check className="w-4 h-4 text-blue-600" />
-              <span>Tarif mahasiswa mulai <strong>Rp 350 / lembar</strong></span>
+              <span>Student rates from <strong>Rp 350 / page</strong></span>
             </div>
             <div className="flex items-center space-x-2">
               <MapPin className="w-4 h-4 text-blue-600" />
-              <span>Gratis antar ke <strong>Tower 1-4 & NBH</strong></span>
+              <span>Free drop-off to <strong>Tower 1–4 & NBH</strong></span>
             </div>
             <div className="flex items-center space-x-2">
               <Clock className="w-4 h-4 text-blue-600" />
-              <span>Tersedia pengerjaan <strong>Kilat Express</strong></span>
+              <span>Express rush turnaround <strong>available</strong></span>
             </div>
           </div>
 

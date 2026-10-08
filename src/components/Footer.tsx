@@ -16,29 +16,29 @@ export const Footer: React.FC = () => {
               "All Student Services, One Platform. — Your needs, unified."
             </p>
             <p className="text-slate-500 text-xs leading-relaxed max-w-sm">
-              Layanan terpadu mahasiswa President University untuk percetakan berkas, fotokopi, pembuatan name tag panitia ospek, pengetikan tugas, gantungan kunci kustom, dan penerjemahan abstrak di Cikarang.
+              Integrated student services for President University: academic printing, duplication, orientation name tags, assignment typing, custom acrylic merchandise, and journal translation in Cikarang.
             </p>
           </div>
 
           {/* 6 Services list */}
           <div className="space-y-2.5">
-            <h4 className="text-slate-900 font-semibold text-xs uppercase tracking-wider">6 Layanan</h4>
+            <h4 className="text-slate-900 font-semibold text-xs uppercase tracking-wider">6 Services</h4>
             <ul className="space-y-1.5 text-xs text-slate-600">
-              <li><a href="#order-portal" className="hover:text-blue-600">Print & Skripsi</a></li>
-              <li><a href="#order-portal" className="hover:text-blue-600">Fotokopi Modul</a></li>
-              <li><a href="#order-portal" className="hover:text-blue-600">Name Tag Panitia & Ospek</a></li>
-              <li><a href="#order-portal" className="hover:text-blue-600">Ketik Tugas & Format</a></li>
-              <li><a href="#order-portal" className="hover:text-blue-600">Gantungan Kunci Akrilik</a></li>
-              <li><a href="#order-portal" className="hover:text-blue-600">Academic Translation</a></li>
+              <li><a href="#order-portal" className="hover:text-blue-600">Thesis & Document Printing</a></li>
+              <li><a href="#order-portal" className="hover:text-blue-600">Coursepack Photocopying</a></li>
+              <li><a href="#order-portal" className="hover:text-blue-600">Event & Orientation Name Tags</a></li>
+              <li><a href="#order-portal" className="hover:text-blue-600">Assignment Typing & Formatting</a></li>
+              <li><a href="#order-portal" className="hover:text-blue-600">Custom Acrylic Keychains</a></li>
+              <li><a href="#order-portal" className="hover:text-blue-600">Academic Translation (ID ⇄ EN)</a></li>
             </ul>
           </div>
 
           {/* Operational Hours */}
           <div className="space-y-2.5">
-            <h4 className="text-slate-900 font-semibold text-xs uppercase tracking-wider">Operasional</h4>
+            <h4 className="text-slate-900 font-semibold text-xs uppercase tracking-wider">Operations</h4>
             <p className="text-slate-700 text-xs">
-              Senin - Minggu: <br />
-              <strong className="text-slate-900">07:30 - 22:00 WIB</strong>
+              Monday – Sunday: <br />
+              <strong className="text-slate-900">07:30 – 22:00 WIB</strong>
             </p>
             <div className="pt-1 text-[11px] space-y-1 text-slate-500">
               <p className="flex items-center gap-1.5">

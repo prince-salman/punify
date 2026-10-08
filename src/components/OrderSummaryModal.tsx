@@ -32,21 +32,27 @@ export const OrderSummaryModal: React.FC<OrderSummaryModalProps> = ({
   onViewTracker,
 }) => {
   const [copied, setCopied] = useState(false);
-  const [paymentDone, setPaymentDone] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState<string>('GoPay');
-  const [isProcessingPayment, setIsProcessingPayment] = useState<boolean>(false);
-  const [secondsRemaining, setSecondsRemaining] = useState<number>(894); // ~14m 54s
-  const [trxRef] = useState<string>(() => `TRX-${Math.floor(100000 + Math.random() * 900000)}`);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentDone, setPaymentDone] = useState(false);
+  const [secondsRemaining, setSecondsRemaining] = useState(15 * 60);
+  const [trxRef] = useState(`QRIS-${Math.floor(100000 + Math.random() * 900000)}`);
 
   const selectedDorm = DORM_LOCATIONS.find((d) => d.id === orderState.customerDormId);
 
-  // Live countdown timer
+  // Countdown timer for realistic payment window
   useEffect(() => {
     if (paymentDone) return;
-    const timer = setInterval(() => {
-      setSecondsRemaining((prev) => (prev > 0 ? prev - 1 : 0));
+    const interval = setInterval(() => {
+      setSecondsRemaining((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
-    return () => clearInterval(timer);
+    return () => clearInterval(interval);
   }, [paymentDone]);
 
   const formatTimer = (sec: number) => {
@@ -60,22 +66,22 @@ export const OrderSummaryModal: React.FC<OrderSummaryModalProps> = ({
     : `http://localhost:3000/#tracker?id=${invoice.orderId}`;
 
   const waMessage = encodeURIComponent(
-`*KONFIRMASI PESANAN PUNIFY*
+`*PUNIFY ORDER CONFIRMATION*
 ==========================
-*No. Order:* ${invoice.orderId}
-*Nama:* ${orderState.customerName}
-*No. WA:* ${orderState.customerPhone}
-*Layanan:* ${invoice.serviceName}
-*Jumlah:* ${['printing', 'photocopy', 'typing', 'translate'].includes(orderState.serviceId) ? `${orderState.pageCount} Halaman` : `${orderState.quantity} Pcs`}
-*File:* ${orderState.fileName || 'Kirim via WhatsApp'}
-*Titik Drop:* ${selectedDorm?.name || 'Cikarang Hub'} (${orderState.customerRoomNumber || 'Lobby'})
-*Catatan:* ${orderState.notes || '-'}
+*Order ID:* ${invoice.orderId}
+*Student Name:* ${orderState.customerName}
+*WhatsApp:* ${orderState.customerPhone}
+*Service:* ${invoice.serviceName}
+*Volume:* ${['printing', 'photocopy', 'typing', 'translate'].includes(orderState.serviceId) ? `${orderState.pageCount} Pages` : `${orderState.quantity} Pcs`}
+*File:* ${orderState.fileName || 'Send via WhatsApp'}
+*Drop Point:* ${selectedDorm?.name || 'PresUniv Hub'} (${orderState.customerRoomNumber || 'Lobby Desk'})
+*Notes:* ${orderState.notes || '-'}
 --------------------------
-*Total Biaya:* Rp ${invoice.grandTotal.toLocaleString('id-ID')}
-*Status Bayar:* ${paymentDone ? `LUNAS (${selectedWallet} - Ref: ${trxRef})` : 'Menunggu Pembayaran'}
-*Link Lacak Realtime:* ${trackingUrl}
+*Total Amount:* Rp ${invoice.grandTotal.toLocaleString('id-ID')}
+*Payment Status:* ${paymentDone ? `PAID (${selectedWallet} - Ref: ${trxRef})` : 'Pending Payment'}
+*Live Tracking Link:* ${trackingUrl}
 ==========================
-Halo admin PUNIFY, saya ingin konfirmasi pesanan ini agar segera diproses. Terima kasih!`
+Hello PUNIFY Admin, I would like to confirm my order for immediate processing. Thank you!`
   );
 
   const adminWhatsAppUrl = `https://wa.me/${ADMIN_WHATSAPP_INTL}?text=${waMessage}`;
@@ -108,7 +114,7 @@ Halo admin PUNIFY, saya ingin konfirmasi pesanan ini agar segera diproses. Terim
       updateOrderStatus(
         invoice.orderId, 
         'verified', 
-        `Pembayaran QRIS lunas via ${selectedWallet} (Ref: ${trxRef})`, 
+        `Payment verified via ${selectedWallet} (Ref: ${trxRef})`, 
         'paid',
         selectedWallet
       );
@@ -124,7 +130,7 @@ Halo admin PUNIFY, saya ingin konfirmasi pesanan ini agar segera diproses. Terim
           <div className="flex items-center space-x-3">
             <img src="/punify-logo.png" alt="PUNIFY" className="h-9 w-auto object-contain" />
             <div>
-              <h3 className="text-sm font-bold text-slate-900">Pesanan Berhasil Disimpan</h3>
+              <h3 className="text-sm font-bold text-slate-900">Order Saved Successfully</h3>
               <p className="text-[11px] font-mono text-slate-500">Order ID: {invoice.orderId}</p>
             </div>
           </div>
@@ -141,23 +147,23 @@ Halo admin PUNIFY, saya ingin konfirmasi pesanan ini agar segera diproses. Terim
           {/* Receipt Card */}
           <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
             <div className="flex justify-between">
-              <span className="text-slate-500">Pemesan</span>
+              <span className="text-slate-500">Student</span>
               <span className="font-semibold text-slate-900">{orderState.customerName} ({orderState.customerPhone})</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">Layanan</span>
+              <span className="text-slate-500">Service</span>
               <span className="font-semibold text-blue-700">{invoice.serviceName}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">Titik Drop</span>
-              <span className="text-slate-800 text-right">{selectedDorm?.name} ({orderState.customerRoomNumber || 'Lobby'})</span>
+              <span className="text-slate-500">Drop Point</span>
+              <span className="text-slate-800 text-right">{selectedDorm?.name} ({orderState.customerRoomNumber || 'Lobby Desk'})</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">Estimasi Selesai</span>
+              <span className="text-slate-500">Est. Completion</span>
               <span className="text-slate-800">{invoice.estimatedCompletion}</span>
             </div>
             <div className="pt-2 border-t border-slate-200 flex justify-between items-baseline">
-              <span className="text-xs text-slate-500">Total Biaya:</span>
+              <span className="text-xs text-slate-500">Total Amount:</span>
               <span className="text-xl font-mono font-bold text-slate-900">
                 Rp {invoice.grandTotal.toLocaleString('id-ID')}
               </span>
@@ -169,11 +175,11 @@ Halo admin PUNIFY, saya ingin konfirmasi pesanan ini agar segera diproses. Terim
             <div className="flex items-center justify-between pb-2 border-b border-slate-200">
               <span className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
                 <QrCode className="w-4 h-4 text-blue-600" />
-                <span>QRIS Standar Bank Indonesia</span>
+                <span>Bank Indonesia Standard QRIS</span>
               </span>
               <span className="flex items-center space-x-1 text-[11px] font-mono font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded">
                 <Clock className="w-3 h-3 text-amber-600" />
-                <span>{paymentDone ? 'LUNAS' : formatTimer(secondsRemaining)}</span>
+                <span>{paymentDone ? 'PAID' : formatTimer(secondsRemaining)}</span>
               </span>
             </div>
 
@@ -193,7 +199,7 @@ Halo admin PUNIFY, saya ingin konfirmasi pesanan ini agar segera diproses. Terim
             {!paymentDone && (
               <div className="space-y-2 pt-1">
                 <span className="text-[11px] text-slate-600 font-medium block">
-                  Pilih aplikasi pembayaran untuk simulasi:
+                  Select payment method to simulate gateway response:
                 </span>
                 <div className="flex justify-center flex-wrap gap-1.5 text-xs">
                   {['GoPay', 'BCA Mobile', 'ShopeePay', 'Dana', 'OVO'].map((w) => (
@@ -221,12 +227,12 @@ Halo admin PUNIFY, saya ingin konfirmasi pesanan ini agar segera diproses. Terim
                   {isProcessingPayment ? (
                     <>
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Memverifikasi Transaksi ke Gateway...</span>
+                      <span>Verifying Transaction with Gateway...</span>
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                      <span>Simulasikan Pembayaran via {selectedWallet} (Realtime)</span>
+                      <span>Simulate Payment via {selectedWallet} (Real-time)</span>
                     </>
                   )}
                 </button>
@@ -237,10 +243,10 @@ Halo admin PUNIFY, saya ingin konfirmasi pesanan ini agar segera diproses. Terim
               <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-900 font-semibold text-xs flex flex-col items-center justify-center space-y-1 animate-fade-in">
                 <div className="flex items-center space-x-1.5">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span>✓ PEMBAYARAN LUNAS DIVERIFIKASI</span>
+                  <span>✓ PAYMENT VERIFIED & CONFIRMED</span>
                 </div>
                 <span className="text-[11px] font-mono text-emerald-700 font-normal">
-                  Metode: {selectedWallet} • Ref: {trxRef}
+                  Method: {selectedWallet} • Ref: {trxRef}
                 </span>
               </div>
             )}
@@ -255,7 +261,7 @@ Halo admin PUNIFY, saya ingin konfirmasi pesanan ini agar segera diproses. Terim
               className="w-full py-3.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm flex items-center justify-center space-x-2 transition-colors shadow-xs"
             >
               <MessageCircle className="w-4 h-4" />
-              <span>Kirim Rincian Pesanan ke WhatsApp Admin</span>
+              <span>Forward Order Details to Admin WhatsApp</span>
               <ExternalLink className="w-3.5 h-3.5 ml-1" />
             </a>
 
@@ -266,7 +272,7 @@ Halo admin PUNIFY, saya ingin konfirmasi pesanan ini agar segera diproses. Terim
                 className="py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-medium flex items-center justify-center space-x-1 transition-colors"
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copied ? 'Tersalin' : 'Salin ID Pesanan'}</span>
+                <span>{copied ? 'Copied' : 'Copy Order ID'}</span>
               </button>
 
               <button
@@ -277,7 +283,7 @@ Halo admin PUNIFY, saya ingin konfirmasi pesanan ini agar segera diproses. Terim
                 }}
                 className="py-2.5 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 font-semibold text-center truncate transition-colors"
               >
-                Lacak Status ➔
+                Track Status ➔
               </button>
             </div>
           </div>

@@ -8,13 +8,20 @@ import { WorkflowTimeline } from './components/WorkflowTimeline';
 import { TeamSection } from './components/TeamSection';
 import { Footer } from './components/Footer';
 import { OrderSummaryModal } from './components/OrderSummaryModal';
+import { LiveOrderToast } from './components/LiveOrderToast';
 import { ServiceId, CalculatedInvoice, OrderState } from './types/order';
+import { initCloudSync } from './utils/cloudSync';
 
 export function App() {
   const [selectedServiceId, setSelectedServiceId] = useState<ServiceId>('printing');
   const [activeModalInvoice, setActiveModalInvoice] = useState<CalculatedInvoice | null>(null);
   const [activeOrderState, setActiveOrderState] = useState<OrderState | null>(null);
   const [trackedOrderId, setTrackedOrderId] = useState<string>('PUN-2026-4821');
+
+  // Initialize real-time cross-device cloud synchronization
+  useEffect(() => {
+    initCloudSync();
+  }, []);
 
   // Handle deep-link scrolling if visiting with #tracker or ?track= / ?id=
   useEffect(() => {
@@ -115,6 +122,14 @@ export function App() {
 
       {/* Footer */}
       <Footer />
+
+      {/* Floating Real-Time Incoming Order Alert Toast */}
+      <LiveOrderToast
+        onViewOrder={(orderId) => {
+          setTrackedOrderId(orderId);
+          handleScrollToTracker();
+        }}
+      />
 
       {/* Order Summary & QRIS/WhatsApp Modal */}
       {activeModalInvoice && activeOrderState && (

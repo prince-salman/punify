@@ -167,7 +167,7 @@ export const getSavedOrders = (): SavedOrder[] => {
   }
 };
 
-export const saveOrder = (order: SavedOrder): void => {
+export const saveOrder = (order: SavedOrder, broadcastTabs = true): void => {
   try {
     const orders = getSavedOrders();
     const existingIndex = orders.findIndex((o) => o.orderId.toUpperCase() === order.orderId.toUpperCase());
@@ -184,7 +184,7 @@ export const saveOrder = (order: SavedOrder): void => {
     window.dispatchEvent(new Event('punify_orders_updated'));
 
     // Broadcast across browser tabs
-    if (syncChannel) {
+    if (broadcastTabs && syncChannel) {
       try {
         syncChannel.postMessage({ type: 'order_saved', orderId: order.orderId });
       } catch {

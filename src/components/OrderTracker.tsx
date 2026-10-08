@@ -27,6 +27,7 @@ import {
   encodeOrderForUrl, 
   SavedOrder 
 } from '../utils/orderStorage';
+import { broadcastOrderUpdate } from '../utils/cloudSync';
 import { OrderStatus } from '../types/order';
 import { sounds } from '../utils/audio';
 import { ADMIN_WHATSAPP_INTL } from '../data/contact';
@@ -166,6 +167,7 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ initialOrderId = 'PU
     if (updated) {
       setCurrentOrder({ ...updated });
       setAllOrders(getSavedOrders());
+      broadcastOrderUpdate(updated);
       setFeedbackMsg(`✓ Order status updated: "${newStatus.replace('_', ' ')}"!`);
       setTimeout(() => setFeedbackMsg(''), 3500);
     }
@@ -224,31 +226,42 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ initialOrderId = 'PU
               Directly synced with President University print operators and dorm couriers.
             </p>
 
-            {/* Mode Switcher Tabs */}
-            <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-lg text-xs font-semibold w-fit mt-3">
-              <button
-                type="button"
-                onClick={() => setViewMode('student')}
-                className={`px-3 py-1.5 rounded-md transition-colors ${
-                  viewMode === 'student'
-                    ? 'bg-white text-blue-700 shadow-2xs font-bold'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                👤 Student View
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('operator')}
-                className={`px-3 py-1.5 rounded-md transition-colors flex items-center space-x-1.5 ${
-                  viewMode === 'operator'
-                    ? 'bg-blue-600 text-white shadow-2xs font-bold'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <Wrench className="w-3.5 h-3.5" />
-                <span>Print Desk & Courier Panel</span>
-              </button>
+            {/* Mode Switcher Tabs & Live Cloud Sync Status */}
+            <div className="flex flex-wrap items-center gap-2 mt-3">
+              <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-lg text-xs font-semibold w-fit">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('student')}
+                  className={`px-3 py-1.5 rounded-md transition-colors ${
+                    viewMode === 'student'
+                      ? 'bg-white text-blue-700 shadow-2xs font-bold'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  👤 Student View
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('operator')}
+                  className={`px-3 py-1.5 rounded-md transition-colors flex items-center space-x-1.5 ${
+                    viewMode === 'operator'
+                      ? 'bg-blue-600 text-white shadow-2xs font-bold'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Wrench className="w-3.5 h-3.5" />
+                  <span>Print Desk & Courier Panel</span>
+                </button>
+              </div>
+
+              {/* Cloud Sync Status Indicator */}
+              <div className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-semibold">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+                </span>
+                <span>Cloud Sync Active (Cross-Device)</span>
+              </div>
             </div>
           </div>
 

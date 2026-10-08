@@ -15,6 +15,7 @@ import {
 import { CalculatedInvoice, OrderState } from '../types/order';
 import { DORM_LOCATIONS } from '../data/dorms';
 import { updateOrderStatus, getOrderById, encodeOrderForUrl } from '../utils/orderStorage';
+import { broadcastOrderUpdate } from '../utils/cloudSync';
 import { sounds } from '../utils/audio';
 import { ADMIN_WHATSAPP_INTL } from '../data/contact';
 
@@ -113,13 +114,16 @@ Hello PUNIFY Admin, I would like to confirm my order for immediate processing. T
         console.log(e);
       }
 
-      updateOrderStatus(
+      const updated = updateOrderStatus(
         invoice.orderId, 
         'verified', 
         `Payment verified via ${selectedWallet} (Ref: ${trxRef})`, 
         'paid',
         selectedWallet
       );
+      if (updated) {
+        broadcastOrderUpdate(updated);
+      }
     }, 1200);
   };
 

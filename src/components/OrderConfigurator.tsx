@@ -11,6 +11,7 @@ import { ServiceId, OrderState, CalculatedInvoice } from '../types/order';
 import { DormSelector } from './DormSelector';
 import { DORM_LOCATIONS } from '../data/dorms';
 import { saveOrder, SavedOrder } from '../utils/orderStorage';
+import { broadcastNewOrder } from '../utils/cloudSync';
 import { processUploadedDocument } from '../utils/pdfHelper';
 import { sounds } from '../utils/audio';
 
@@ -295,6 +296,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
 
     sounds.playSuccessChime();
     saveOrder(savedOrder);
+    broadcastNewOrder(savedOrder);
     onSubmitOrder(invoice, orderState, savedOrder);
 
     // Generate fresh order ID for next submission

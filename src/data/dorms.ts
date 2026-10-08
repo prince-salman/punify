@@ -50,11 +50,4 @@ export const DORM_LOCATIONS: DormLocation[] = [
     notes: 'Meeting point in front of ATM Center / Student Lounge',
     deliveryFee: 0,
   },
-  {
-    id: 'cikarang_hub',
-    name: 'Self Pickup — PUNIFY Central Hub (Jl. Ki Hajar Dewantara Cikarang)',
-    zone: 'Off-Campus',
-    notes: 'Direct walk-in pickup for urgent deadlines or immediate checks',
-    deliveryFee: 0,
-  },
 ];

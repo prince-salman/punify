@@ -150,7 +150,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
 
     let countMultiplier = 1;
     if (['printing', 'photocopy'].includes(currentService.id)) {
-      countMultiplier = Math.max(1, pageCount);
+      countMultiplier = Math.min(1000, Math.max(1, pageCount));
     } else {
       countMultiplier = Math.max(1, quantity);
     }
@@ -197,8 +197,13 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
         });
 
         if (processed.isPdf && ['printing', 'photocopy'].includes(currentService.id)) {
-          setPageCount(processed.detectedPages);
-          setFileNotification(`✓ PDF document detected: ${processed.detectedPages} pages synced to price calculator!`);
+          const clampedPages = Math.min(1000, Math.max(1, processed.detectedPages));
+          setPageCount(clampedPages);
+          setFileNotification(
+            processed.detectedPages > 1000
+              ? `✓ PDF detected: ${processed.detectedPages} pages (Capped to maximum 1,000 pages for this order).`
+              : `✓ PDF document detected: ${processed.detectedPages} pages synced to price calculator!`
+          );
           sounds.playNotificationPing();
         } else {
           setFileNotification(`✓ File "${processed.name}" (${processed.size}) attached successfully.`);
@@ -219,14 +224,25 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
       setFormError('Please enter your full name.');
       return;
     }
-    if (!customerPhone.trim()) {
-      setFormError('Please enter your WhatsApp number.');
+
+    const cleanPhone = customerPhone.replace(/\D/g, '');
+    if (!cleanPhone) {
+      setFormError('Please enter your WhatsApp number (numbers only, e.g. 081234567890).');
+      return;
+    }
+    if (cleanPhone.length < 9 || cleanPhone.length > 15) {
+      setFormError('Please enter a valid WhatsApp number (9 to 15 digits).');
+      return;
+    }
+
+    if (['printing', 'photocopy'].includes(currentService.id) && pageCount > 1000) {
+      setFormError('Maximum page count is 1,000 pages per order.');
       return;
     }
     setFormError('');
 
     const selectedDorm = DORM_LOCATIONS.find((d) => d.id === dormId);
-    const orderQty = ['printing', 'photocopy'].includes(currentService.id) ? pageCount : quantity;
+    const orderQty = ['printing', 'photocopy'].includes(currentService.id) ? Math.min(1000, Math.max(1, pageCount)) : quantity;
 
     const orderState: OrderState = {
       serviceId: activeServiceId,
@@ -478,12 +494,14 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
               <div>
                 <span className="text-xs font-semibold text-slate-900 block">
                   {['printing', 'photocopy'].includes(currentService.id)
-                    ? 'Page Count'
+                    ? 'Page Count (Max 1,000)'
                     : 'Quantity (Pcs)'}
                 </span>
                 <span className="text-[11px] text-slate-500">
-                  {pageCount >= 50 && ['printing', 'photocopy'].includes(currentService.id)
-                    ? 'Automatic 5% bulk discount applied for ≥ 50 pages'
+                  {['printing', 'photocopy'].includes(currentService.id)
+                    ? (pageCount >= 50
+                        ? 'Automatic 5% bulk discount applied for ≥ 50 pages (Max 1,000 pages)'
+                        : 'Max 1,000 pages per order • Use stepper or enter directly')
                     : 'Use stepper buttons or enter count directly'}
                 </span>
               </div>
@@ -505,12 +523,13 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
                 <input
                   type="number"
                   min="1"
+                  max={['printing', 'photocopy'].includes(currentService.id) ? 1000 : 9999}
                   step="1"
                   value={['printing', 'photocopy'].includes(currentService.id) ? pageCount : quantity}
                   onChange={(e) => {
                     const val = parseInt(e.target.value) || 1;
                     if (['printing', 'photocopy'].includes(currentService.id)) {
-                      setPageCount(Math.max(1, val));
+                      setPageCount(Math.min(1000, Math.max(1, val)));
                     } else {
                       setQuantity(Math.max(1, val));
                     }
@@ -521,7 +540,7 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
                   type="button"
                   onClick={() => {
                     if (['printing', 'photocopy'].includes(currentService.id)) {
-                      setPageCount((p) => p + 1);
+                      setPageCount((p) => Math.min(1000, p + 1));
                     } else {
                       setQuantity((q) => q + 1);
                     }
@@ -718,15 +737,24 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
 
                 <div>
                   <label className="text-[11px] font-semibold text-slate-800 block mb-1">
-                    WhatsApp Number *
+                    WhatsApp Number (Numbers Only) *
                   </label>
                   <input
                     type="tel"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={15}
                     value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
-                    placeholder="08xxxxxxxxxx"
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 text-xs focus:outline-none focus:border-blue-600"
+                    onChange={(e) => {
+                      const onlyNumbers = e.target.value.replace(/\D/g, '');
+                      setCustomerPhone(onlyNumbers);
+                    }}
+                    placeholder="081234567890"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 font-mono text-xs focus:outline-none focus:border-blue-600"
                   />
+                  <span className="text-[10px] text-slate-400 block mt-0.5">
+                    Only digits allowed (no letters or symbols)
+                  </span>
                 </div>
               </div>
 

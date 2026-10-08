@@ -491,18 +491,19 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
                   type="button"
                   onClick={() => {
                     if (['printing', 'photocopy', 'typing', 'translate'].includes(currentService.id)) {
-                      setPageCount((p) => Math.max(1, p - 5));
+                      setPageCount((p) => Math.max(1, p - 1));
                     } else {
                       setQuantity((q) => Math.max(1, q - 1));
                     }
                   }}
-                  className="w-7 h-7 rounded border border-slate-300 bg-white text-slate-800 font-bold text-xs hover:bg-slate-100"
+                  className="w-7 h-7 rounded border border-slate-300 bg-white text-slate-800 font-bold text-xs hover:bg-slate-100 transition-colors"
                 >
                   -
                 </button>
                 <input
                   type="number"
                   min="1"
+                  step="1"
                   value={['printing', 'photocopy', 'typing', 'translate'].includes(currentService.id) ? pageCount : quantity}
                   onChange={(e) => {
                     const val = parseInt(e.target.value) || 1;
@@ -512,18 +513,18 @@ export const OrderConfigurator: React.FC<OrderConfiguratorProps> = ({
                       setQuantity(Math.max(1, val));
                     }
                   }}
-                  className="w-14 text-center py-1 rounded border border-slate-300 bg-white text-slate-900 font-mono text-xs"
+                  className="w-14 text-center py-1 rounded border border-slate-300 bg-white text-slate-900 font-mono text-xs focus:outline-none focus:border-blue-600"
                 />
                 <button
                   type="button"
                   onClick={() => {
                     if (['printing', 'photocopy', 'typing', 'translate'].includes(currentService.id)) {
-                      setPageCount((p) => p + 5);
+                      setPageCount((p) => p + 1);
                     } else {
                       setQuantity((q) => q + 1);
                     }
                   }}
-                  className="w-7 h-7 rounded border border-slate-300 bg-white text-slate-800 font-bold text-xs hover:bg-slate-100"
+                  className="w-7 h-7 rounded border border-slate-300 bg-white text-slate-800 font-bold text-xs hover:bg-slate-100 transition-colors"
                 >
                   +
                 </button>
